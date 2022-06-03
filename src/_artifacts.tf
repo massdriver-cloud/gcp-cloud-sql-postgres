@@ -35,4 +35,3 @@ resource "massdriver_artifact" "authentication" {
     }
   )
 }
-
