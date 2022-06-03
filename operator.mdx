@@ -1,20 +1,14 @@
-# Operator Guide
-
-This is the guide for your bundle. It will appear under the `guide` button in Massdriver.
-
-Use it to describe to users how the bundle works, use cases for the bundle, and event examples.
-
-<!-- We may want to polish this for template before releasing --> 
+# Operator Guide for "{type}"
 
 ## TODO:
 
-* [ ] Write a design doc / operator guide
+* [+] Write a design doc / operator guide
 * [ ] Write bundle code
-  * [ ] Defing params & connections JSON schema
-  * [ ] Write 2-3 Guided Configs
-  * [ ] Define artifact schema, design new artifact definitions if necessary
+  * [+] Defing params & connections JSON schema
+  * [+] Write 2-3 Guided Configs
+  * [+] Define artifact schema, design new artifact definitions if necessary
   * [ ] Test each guided config
-  * [ ] View params schema in storybook, [write UI schema](https://react-jsonschema-form.readthedocs.io/en/latest/usage/widgets/) for sorting fields, etc
+  * [+] View params schema in storybook, [write UI schema](https://react-jsonschema-form.readthedocs.io/en/latest/usage/widgets/) for sorting fields, etc
 * [ ] Write user guide
 * [ ] Remove this TODO block
 
@@ -22,32 +16,63 @@ _Brief description of bundle from an operator's point of view_
 
 ## Use Cases
 
-_Common use cases for this bundle_
-
+Google Cloud SQL - PostgreSQL is a fully managed database service. Backups, failovers and more for your Postgres database are managed for you. Easily deploy, secure, and scale your backend so you can focus on other things.
 ### Guided Configs
 
-_Describe the guided configs_
-
++ Production
+  + For production we reccomend using the latest version of Postgres, with a 32 core compute node and a 1TB disk. High availability, backups, and deletion protection are also enabled by default.
++ Staging
+  + Staging is configured exactly like production, but with a smaller tier and disk size. You want a production-like environment as a last stop before you release new features to the public.
++ Development
+  +  1 read replica, HA enabled, backups, no public IP
 ## Design
+
+
 
 ### How It Works
 
-_Describe how it works_
+It's typical to set up a relational database like this with a _primary_ instance for writes and then a read replica for offline workloads as to not impact the primary database. In this setup, a command strategy is to use the read replica as a failover for the primary instance. In GCP we can achieve this behavior but the mechanics are slightly different.
+
+For high-availibitly ([doc](https://cloud.google.com/sql/docs/mysql/high-availability#HA-configuration)), Google will provision a _standby_ instance in a different zone that your _primary_ instance. You can't access this instance but in the case of a zonal failure, Google will automatically failover by directing traffic to the _standby_ instance. This double the cost of the service but comes with full SLAs.
+
+Read replicas will be supported in the next release of this bundle.
 
 #### Best Practices
 
-#### Security 
+* The database is not provisioned with a public IP
+* HA is enabled by default
+* Backups cant be disabled
+* High availability
+
+This bundle supports regional HA. If there's a zonal outage, failover is performed automatically for you. We do not currently support _failbacks_ (after recovery, moving the primary instance back to the original zone).
+
+##### Replication
+
+Replica configuration will be supported in a future release. Google reccomends that you keep the number of relipacs below 10 for your primary instance.
+
+#### Security
+
+IAM
+Connection Options
 
 #### Auditing
+
+This bundle allows you to configure the transaction log policy.
 
 #### Compliance
 
 #### Observability
 
++ [Debug docs](https://cloud.google.com/sql/docs/postgres/debugging-connectivity)
++ A client that can be used with Cloud SQL Proxy to connect to your database instance. [pg admin](https://www.pgadmin.org/)
+
 ### Trade-offs
 
-_List trade offs made with this bundle_
++ Deciding not to support public IP
++ Supporting _only_ the Cloud SQL Auth proxy (for now)
++ SSL/TLS only, no support for unencrypted traffic
++ This bundle supports regional HA. If there's a zonal outage, failover is performed automatically for you. We do not currently support _failbacks_ (after recovery, moving the primary instance back to the original zone).
 
 ### Permissions
 
-_list IAM permissions required on this bundle._
+`cloudsql.instances.connect`

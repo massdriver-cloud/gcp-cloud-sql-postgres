@@ -1,66 +1,179 @@
-# This file will be used to generate all of the schema-*.json files in a bundle
 schema: draft-07
-name: "gcp-cloud-sql-postgres"
-description: ""
-ref: github.com/YOUR_NAME_HERE/gcp-cloud-sql-postgres
-access: "public"
-type: "bundle"
+name: gcp-cloud-sql-postgres
+description: "Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases."
+ref: github.com/massdriver-cloud/massdriver-bundles
+access: public
+type: bundle
 
 steps:
   - path: src
     provisioner: terraform
 
-# schema-params.json
-# JSON Schema sans-fields above
 params:
   examples:
-    - foo: US-West 2 VPC
-    - foo: US-East 1 VPC
+    - __name: Production
+      engine_version: "14.x"
+      instance_configuration:
+        tier: "db-n1-standard-32"
+        disk_size: 1000
+      database_configuration:
+        retained_backup_count: 7
+        query_insights_enabled: true
+      deletion_protection: true
+    - __name: Staging
+      engine_version: "14.x"
+      instance_configuration:
+        tier: "db-n1-standard-8"
+        disk_size: 200
+      database_configuration:
+        retained_backup_count: 7
+        query_insights_enabled: true
+      deletion_protection: true
+    - __name: Development
+      engine_version: "14.x"
+      instance_configuration:
+        tier: "db-f1-micro"
+        disk_size: 20
+      database_configuration:
+        retained_backup_count: 1
+      deletion_protection: false
   required:
-    - foo
+    - engine_version
+    - username
   properties:
-    foo:
+    engine_version:
       type: string
-      title: Foo
-      description: Name of gcp-cloud-sql-postgres
-      default: ""
-      examples:
-        - US-West 2 VPC
-        - US-East 1 VPC
+      title: PostgreSQL Major Version
+      description: The major version of PostgreSQL to use for your database. GCP manages minor version upgrades.
+      default: 14.x
+      enum:
+        - 14.x
+        - 13.x
+        - 12.x
+        - 11.x
+        - 10.x
+        - 9.6.x
+    username:
+      title: Username
+      description: Primary DB username.
+      type: string
+      default: root
+      minLength: 1
+      maxLength: 63
+    instance_configuration:
+      type: object
+      title: Instance Configuration
+      description: "Instance type, disk size, configure properties for your primary instance."
+      required:
+        - disk_size
+        - disk_type
+        - tier
+      properties:
+        disk_size:
+          type: integer
+          title: Disk Size
+          description: The size of the primary database instance in GB.
+          minimum: 20
+          maximum: 3054
+        disk_type:
+          type: string
+          title: Disk Type
+          description: Solid State has better performance for mixtures of reads and writes. Use Hard Disks for continuous read workloads or for cheaper storage.
+          default: Solid State
+          enum:
+            - Solid State
+            - Hard Disk
+        tier:
+          type: string
+          title: Instance Type
+          description: The type of compute used for the master instance.
+          enum:
+            - db-f1-micro
+            - db-g1-small
+            - db-n1-standard-1
+            - db-n1-standard-2
+            - db-n1-standard-4
+            - db-n1-standard-8
+            - db-n1-standard-16
+            - db-n1-standard-32
+            - db-n1-standard-64
+            - db-n1-standard-96
+            - db-n1-highmem-2
+            - db-n1-highmem-4
+            - db-n1-highmem-8
+            - db-n1-highmem-16
+            - db-n1-highmem-32
+            - db-n1-highmem-64
+            - db-n1-highmem-96
+    database_configuration:
+      type: object
+      title: Database Configuration
+      description: "High availability, backups, other database settings can be configured here."
+      required:
+        - retained_backup_count
+      properties:
+        high_availability_enabled:
+          type: boolean
+          title: Enable High Availability
+          description: If set to true, GCP will manage a hot standby primary node for you. It will automatically fail over to the hot stanby in the event of a zonal or node failure drastically minimizing downtime.
+          default: true
+        retained_backup_count:
+          type: integer
+          title: Max Backups To Keep
+          description: The number of backups to keep. If another backup is made, the oldest one is deleted.
+          minimum: 0
+          maximum: 20
+        query_insights_enabled:
+          type: boolean
+          title: Query Insights Enabled
+          description: Enables query insights for your instance
+          default: false
+    transaction_log_retention_days:
+      type: integer
+      title: Transaction Log Retention Days
+      description: The number of days to keep the transaction logs before deleting them.
+      default: 5
+      minimum: 1
+      maximum: 7
+    deletion_protection:
+      title: Deletion Protection
+      description: If the DB instance should have deletion protection enabled.
+      type: boolean
+      default: true
 
-# schema-connections.json
-# Named list of input connections (artifacts) (map[name]artifact)
 connections:
-  properties: {}
-  # required:
-  # - aws_authentication
-  # - network
-  # properties:
-  #   aws_authentication:
-  #     $ref: massdriver/aws-iam-role
-  #   network:
-  #     $ref: massdriver/aws-regional-cloud
+  required:
+    - gcp_authentication
+    - subnetwork
+  properties:
+    gcp_authentication:
+      $ref: massdriver/gcp-service-account
+    subnetwork:
+      $ref: massdriver/gcp-subnetwork
 
-# schema-artifacts.json
-# Named list of output artifacts  (map[name]artifact)
 artifacts:
-  properties: {}
-  # required:
-  #   - network
-  # properties:
-  #   network:
-  #     $ref: massdriver/aws-regional-cloud
+  required:
+    - authentication
+  properties:
+    authentication:
+      $ref: massdriver/postgresql-authentication
 
-# schema-ui.json
-# List of form customizations for params-schema
 ui:
   ui:order:
+    - engine_version
+    - username
+    - instance_configuration
+    - database_configuration
+    - transaction_log_retention_days
+    - deletion_protection # Need to keep this so people CAN delete (turn it off, then delete)
     - "*"
-  ## set top level ui:wiget
-  # secret_key:
-  #    ui:widget: "password"
-  ## Set key in an array of objects
-  # secrets:
-  #   items:
-  #     mdKeyId:
-  #       ui:widget: "hidden"
+  instance_configuration:
+    ui:order:
+      - disk_size
+      - disk_type
+      - tier
+  database_configuration:
+    ui:order:
+      - high_availability_enabled
+      - retained_backup_count
+      - query_insights_enabled
