@@ -1,5 +1,5 @@
 
 module "apis" {
-  source   = "../../../provisioners/terraform/modules/gcp-apis"
+  source   = "./modules/gcp-apis"
   services = ["sqladmin.googleapis.com"]
 }

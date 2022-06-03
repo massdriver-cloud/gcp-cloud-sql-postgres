@@ -21,7 +21,7 @@ locals {
 }
 
 module "database_cpu_alarm" {
-  source                         = "../../../provisioners/terraform/modules/gcp-cloud-monitoring-alarm/modules/utilization-threshold"
+  source                         = "./modules/monitoring-utilization-threshold"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: CPU Utilization over threshold ${local.threshold_cpu * 100}%"
   alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
@@ -40,7 +40,7 @@ module "database_cpu_alarm" {
 
 
 module "database_disk_alarm" {
-  source                         = "../../../provisioners/terraform/modules/gcp-cloud-monitoring-alarm/modules/utilization-threshold"
+  source                         = "./modules/monitoring-utilization-threshold"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: Disk capacity over threshold ${local.threshold_disk * 100}%"
   alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
@@ -58,7 +58,7 @@ module "database_disk_alarm" {
 }
 
 module "database_memory_alarm" {
-  source                         = "../../../provisioners/terraform/modules/gcp-cloud-monitoring-alarm/modules/utilization-threshold"
+  source                         = "./modules/monitoring-utilization-threshold"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: Memory capacity over threshold ${local.threshold_memory * 100}%"
   alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
