@@ -13,7 +13,7 @@ locals {
   }
   specs_rdbms = {
     engine  = "PostgreSQL"
-    version = google_sql_database_instance.main.settings[0].version
+    version = google_sql_database_instance.main.database_version
   }
 }
 
