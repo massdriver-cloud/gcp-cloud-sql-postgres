@@ -1,6 +1,6 @@
 locals {
   data_infrastructure = {
-    grn = google_sql_database_instance.main.self_link
+    name = google_sql_database_instance.main.id
   }
 
   data_security = {}
@@ -9,11 +9,11 @@ locals {
     username = google_sql_user.root.name
     password = google_sql_user.root.password
     hostname = google_sql_database_instance.main.private_ip_address
-    port     = "5432"
+    port     = 5432
   }
   specs_rdbms = {
     engine  = "PostgreSQL"
-    version = google_sql_database_instance.main.settings[0].version
+    version = google_sql_database_instance.main.database_version
   }
 }
 
