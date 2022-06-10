@@ -24,7 +24,7 @@ module "database_cpu_alarm" {
   source                         = "github.com/massdriver-cloud/terraform-modules//google-monitoring-utilization-threshold?ref=9201b9f"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: CPU Utilization over threshold ${local.threshold_cpu * 100}%"
-  alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
+  alarm_notification_channel_grn = var.md_metadata.observability.alarm_channels.gcp.id
 
   alarm_name    = "${google_sql_database_instance.main.self_link}-highCPU"
   metric_type   = local.metrics["cpu"].metric
@@ -43,7 +43,7 @@ module "database_disk_alarm" {
   source                         = "github.com/massdriver-cloud/terraform-modules//google-monitoring-utilization-threshold?ref=9201b9f"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: Disk capacity over threshold ${local.threshold_disk * 100}%"
-  alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
+  alarm_notification_channel_grn = var.md_metadata.observability.alarm_channels.gcp.id
 
   alarm_name    = "${google_sql_database_instance.main.self_link}-highDisk"
   metric_type   = local.metrics["disk"].metric
@@ -61,7 +61,7 @@ module "database_memory_alarm" {
   source                         = "github.com/massdriver-cloud/terraform-modules//google-monitoring-utilization-threshold?ref=9201b9f"
   md_metadata                    = var.md_metadata
   message                        = "Cloud SQL Postgres ${google_sql_database_instance.main.self_link}: Memory capacity over threshold ${local.threshold_memory * 100}%"
-  alarm_notification_channel_grn = var.subnetwork.data.observability.alarm_notification_channel_grn
+  alarm_notification_channel_grn = var.md_metadata.observability.alarm_channels.gcp.id
 
   alarm_name    = "${google_sql_database_instance.main.self_link}-highMemory"
   metric_type   = local.metrics["memory"].metric
