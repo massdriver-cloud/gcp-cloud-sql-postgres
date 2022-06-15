@@ -21,7 +21,7 @@ locals {
 }
 
 module "alarm_channel" {
-  source      = "github.com/massdriver-cloud/terraform-modules//gcp-alarm-channel?ref=aa08797"
+  source      = "github.com/massdriver-cloud/terraform-modules//gcp-alarm-channel?ref=bfcf556"
   md_metadata = var.md_metadata
 }
 
