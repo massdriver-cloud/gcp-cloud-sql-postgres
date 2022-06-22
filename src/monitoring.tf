@@ -27,7 +27,7 @@ module "alarm_channel" {
 
 
 module "database_cpu_alarm" {
-  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=8997456"
+  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=cafdc89"
   notification_channel_id = module.alarm_channel.id
   md_metadata             = var.md_metadata
   display_name            = "CPU Utilization"
@@ -46,7 +46,7 @@ module "database_cpu_alarm" {
 
 
 module "database_disk_alarm" {
-  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=8997456"
+  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=cafdc89"
   notification_channel_id = module.alarm_channel.id
   md_metadata             = var.md_metadata
   display_name            = "Disk Capacity"
@@ -64,7 +64,7 @@ module "database_disk_alarm" {
 }
 
 module "database_memory_alarm" {
-  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=8997456"
+  source                  = "github.com/massdriver-cloud/terraform-modules//gcp-monitoring-utilization-threshold?ref=cafdc89"
   notification_channel_id = module.alarm_channel.id
   md_metadata             = var.md_metadata
   display_name            = "Memory Capacity"
