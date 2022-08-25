@@ -59,6 +59,7 @@ resource "google_sql_database_instance" "main" {
     user_labels       = var.md_metadata.default_tags
 
     ip_configuration {
+      require_ssl     = true
       ipv4_enabled    = false
       private_network = local.network_id
     }
@@ -66,7 +67,7 @@ resource "google_sql_database_instance" "main" {
     backup_configuration {
       # cannot be used with PostgreSQL
       binary_log_enabled             = false
-      enabled                        = var.transaction_log_retention_days > 0
+      enabled                        = true
       transaction_log_retention_days = var.transaction_log_retention_days
 
       backup_retention_settings {
