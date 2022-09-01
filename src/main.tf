@@ -59,7 +59,7 @@ resource "google_sql_database_instance" "main" {
     user_labels       = var.md_metadata.default_tags
 
     ip_configuration {
-      require_ssl     = true
+      require_ssl     = false
       ipv4_enabled    = false
       private_network = local.network_id
     }
