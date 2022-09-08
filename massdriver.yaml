@@ -1,7 +1,7 @@
 schema: draft-07
 name: gcp-cloud-sql-postgres
 description: "Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases."
-ref: github.com/massdriver-cloud/gcp-cloud-sql-postgres
+source_url: github.com/massdriver-cloud/gcp-cloud-sql-postgres
 access: public
 type: bundle
 
