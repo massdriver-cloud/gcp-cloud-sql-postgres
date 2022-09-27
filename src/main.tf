@@ -59,7 +59,7 @@ resource "google_sql_database_instance" "main" {
     user_labels       = var.md_metadata.default_tags
 
     ip_configuration {
-      require_ssl     = false
+      require_ssl     = var.tls_enabled
       ipv4_enabled    = false
       private_network = local.network_id
     }
@@ -98,14 +98,17 @@ resource "google_sql_database_instance" "main" {
     }
   }
 
-  # This allows for disk resizng, borrowed from the docs
-  # but I think we want to disable auto resize and then remove this
-  # lifecycle hook
-  # lifecycle {
-  #   ignore_changes = [
-  #     settings[0].disk_size
-  #   ]
-  # }
+
+  lifecycle {
+    ignore_changes = [
+      # This allows for disk resizng, borrowed from the docs
+      # We might want to gaurd against this and disable auto resize
+      # then remove this lifecycle hook
+      settings[0].disk_size,
+      # ignores changes to existing infrastructure
+      settings[0].ip_configuration[0].require_ssl,
+    ]
+  }
   depends_on = [module.apis]
 }
 

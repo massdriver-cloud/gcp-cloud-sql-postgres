@@ -5,10 +5,6 @@ source_url: github.com/massdriver-cloud/gcp-cloud-sql-postgres
 access: public
 type: bundle
 
-steps:
-  - path: src
-    provisioner: terraform
-
 params:
   examples:
     - __name: Production
@@ -40,6 +36,7 @@ params:
   required:
     - engine_version
     - username
+    - tls_enabled
   properties:
     engine_version:
       type: string
@@ -140,6 +137,12 @@ params:
       description: If the DB instance should have deletion protection enabled.
       type: boolean
       default: true
+    tls_enabled:
+      type: boolean
+      title: TLS Enabled
+      description: Enable TLS encryption
+      default: true
+      $md.immutable: true
 
 connections:
   required:
