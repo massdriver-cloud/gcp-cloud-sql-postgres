@@ -10,6 +10,12 @@ locals {
     password = google_sql_user.root.password
     hostname = google_sql_database_instance.main.private_ip_address
     port     = 5432
+    certificate = var.tls_enabled ? {
+      cert             = google_sql_database_instance.main.server_ca_cert[0].cert
+      create_time      = google_sql_database_instance.redis.server_ca_certs[0].create_time
+      expiration_time  = google_sql_database_instance.redis.server_ca_certs[0].expiration_time
+      sha1_fingerprint = google_sql_database_instance.redis.server_ca_certs[0].sha1_fingerprint
+    } : null
   }
   specs_rdbms = {
     engine  = "PostgreSQL"
