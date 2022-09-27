@@ -59,6 +59,7 @@ Form input parameters for configuring a bundle for deployment.
   - **`disk_size`** *(integer)*: The size of the primary database instance in GB. Minimum: `20`. Maximum: `3054`.
   - **`disk_type`** *(string)*: Solid State has better performance for mixtures of reads and writes. Use Hard Disks for continuous read workloads or for cheaper storage. Must be one of: `['Solid State', 'Hard Disk']`. Default: `Solid State`.
   - **`tier`** *(string)*: The type of compute used for the master instance. Must be one of: `['db-f1-micro', 'db-g1-small', 'db-n1-standard-1', 'db-n1-standard-2', 'db-n1-standard-4', 'db-n1-standard-8', 'db-n1-standard-16', 'db-n1-standard-32', 'db-n1-standard-64', 'db-n1-standard-96', 'db-n1-highmem-2', 'db-n1-highmem-4', 'db-n1-highmem-8', 'db-n1-highmem-16', 'db-n1-highmem-32', 'db-n1-highmem-64', 'db-n1-highmem-96']`.
+- **`tls_enabled`** *(boolean)*: Enable TLS encryption. Default: `True`.
 - **`transaction_log_retention_days`** *(integer)*: The number of days to keep the transaction logs before deleting them. Minimum: `1`. Maximum: `7`. Default: `5`.
 - **`username`** *(string)*: Primary DB username. Default: `root`.
 ## Examples
