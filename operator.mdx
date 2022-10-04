@@ -1,78 +1,74 @@
-# Operator Guide for "{type}"
+# Operator Guide for gcp-cloud-sql-postgres
 
-## TODO:
-
-* [+] Write a design doc / operator guide
-* [ ] Write bundle code
-  * [+] Defing params & connections JSON schema
-  * [+] Write 2-3 Guided Configs
-  * [+] Define artifact schema, design new artifact definitions if necessary
-  * [ ] Test each guided config
-  * [+] View params schema in storybook, [write UI schema](https://react-jsonschema-form.readthedocs.io/en/latest/usage/widgets/) for sorting fields, etc
-* [ ] Write user guide
-* [ ] Remove this TODO block
-
-_Brief description of bundle from an operator's point of view_
+Google Cloud SQL for PostgreSQL enables you to run a relational database with the resiliency, security, scalability, and ease of use of a fully managed cloud service. You gain most of the functionality of a conventional PostgreSQL database management system, while Google Cloud takes care of daily maintenance and regular backups, allowing you to focus on your core competencies.
 
 ## Use Cases
 
-Google Cloud SQL - PostgreSQL is a fully managed database service. Backups, failovers and more for your Postgres database are managed for you. Easily deploy, secure, and scale your backend so you can focus on other things.
-### Guided Configs
+### Highly Scalable Data Store
+PostgreSQL is an open-source object-relational database-management system. With decades of development behind it and as one of the most popular solutions in its class, PostgreSQL excels as a backend database. It is versatile and adaptable.
+### ACID Compliant
+PostgreSQL supports the rigorous requirements of financial institutions and others needing exceptional reliability. It supports atomicity, consistency, isolation, and durability (ACID) and online transaction processing (OLTP). 
+### Spatial Data
+PostgreSQL is highly extensible. PostGIS, an extension for a geographical information system (GIS), provides hundreds of functions to process geometric data. In the decades since its initial release, PostGIS has become one of the de facto standards in the open-source GIS world.
+### JSON Support
+PostgreSQL also supports JSON data in either json or jsonb format. For querying JSON data, PostgreSQL supports the jsonpath data type.
 
-+ Production
-  + For production we reccomend using the latest version of Postgres, with a 32 core compute node and a 1TB disk. High availability, backups, and deletion protection are also enabled by default.
-+ Staging
-  + Staging is configured exactly like production, but with a smaller tier and disk size. You want a production-like environment as a last stop before you release new features to the public.
-+ Development
-  +  1 read replica, HA enabled, backups, no public IP
+## Configuration Presets
+
+### Development
+The development preset does not have deletion protection, allowing you to deprovision the database as needed. Since this preset is not intended for production, it will keep only one backup, and it comes with only a 20 GB disk and a shared-core CPU. This preset is suitable as a low-cost test and development instance only.
+### Staging
+The staging preset provides high availability and the same backup and deletion protection as the production preset, with seven backups kept at all times. However, staging has only eight cores and a smaller 200 GB disk.
+### Production
+The production preset comes with thirty-two cores and a 1 TB disk. High availability, backups, and deletion protection (with seven backups) are enabled by default. For Postgres, we use the latest managed version of the 14.x series. This preset has sufficient resources to support a full production environment.
+
 ## Design
 
+A typical relational database has a primary instance for writes and a read replica for offline workloads, which protects the performance of the primary database. The read replica typically acts as a failover in case the primary goes offline. In Google Cloud SQL for Postgres, we offer the same functionality through a slightly different design.
 
+### High Availability
+Google supports high availability by provisioning a standby instance in a different zone than your primary instance. While you cannot access the standby under normal conditions, Google will automatically direct traffic to it if the primary instance fails. This approach doubles the service cost in exchange for full service-level agreements (SLAs).
+### Read Replicas
+We will support read replicas in a future release of this bundle.
 
-### How It Works
+## Best Practices
+The bundle includes a number of best practices without needing any additional work on your part:
 
-It's typical to set up a relational database like this with a _primary_ instance for writes and then a read replica for offline workloads as to not impact the primary database. In this setup, a command strategy is to use the read replica as a failover for the primary instance. In GCP we can achieve this behavior but the mechanics are slightly different.
+### Security
+The database is not provisioned with a public IP.
+### High availability
+This bundle supports regional high availability, which is enabled by default. In the case of a zonal outage, failover is performed automatically for you. We do not currently support failbacks (that is, moving the primary instance back to the original zone after recovery).
+### Backup and recovery
+Backups are created to recover the database in the event of disaster recovery, and cannot be disabled.
+### Replication
+Replica configuration will be supported in a future release. Google recommends that you keep fewer than ten replicas for your primary instance.
 
-For high-availibitly ([doc](https://cloud.google.com/sql/docs/mysql/high-availability#HA-configuration)), Google will provision a _standby_ instance in a different zone that your _primary_ instance. You can't access this instance but in the case of a zonal failure, Google will automatically failover by directing traffic to the _standby_ instance. This double the cost of the service but comes with full SLAs.
+## Security
+### Auto-generated password
+Upon database creation, we generate a random sixteen-character password.
+### Private deployment
+This database will be available only in the gcp-global-network to which it is connected. 
+### Data encrypted in transit
+By default, all data in transit will be encrypted with Secure Sockets Layer and Transport Layer Security (SSL/TLS).
+### Data encrypted at rest
+By default, all customer content in Google Cloud is encrypted at rest using AES256.
 
-Read replicas will be supported in the next release of this bundle.
+## Auditing
+This bundle allows you to configure the transaction log policy. The minimum allowed days are 1, and the maximum is 7. Transaction logs allow you to perform the following:
+* Individual transaction recovery
+* Recovery of all incomplete transactions when SQL Server is started
+* Rolling a restored database, file, filegroup, or page forward to the point of failure
+* Supporting transactional replication
+* Supporting high availability and disaster-recovery solutions (for example, database mirroring, log shipping, etc.)
 
-#### Best Practices
+## Observability
+This bundle comes with three preconfigured alarms:
 
-* The database is not provisioned with a public IP
-* HA is enabled by default
-* Backups cant be disabled
-* High availability
+* CPU: when the CPU usage exceeds 60%
+* Disk: when the database storage-disk usage exceeds 60%
+* Memory: when the database is using more than 60% of its allocated memory
 
-This bundle supports regional HA. If there's a zonal outage, failover is performed automatically for you. We do not currently support _failbacks_ (after recovery, moving the primary instance back to the original zone).
-
-##### Replication
-
-Replica configuration will be supported in a future release. Google reccomends that you keep the number of relipacs below 10 for your primary instance.
-
-#### Security
-
-IAM
-Connection Options
-
-#### Auditing
-
-This bundle allows you to configure the transaction log policy.
-
-#### Compliance
-
-#### Observability
-
-+ [Debug docs](https://cloud.google.com/sql/docs/postgres/debugging-connectivity)
-+ A client that can be used with Cloud SQL Proxy to connect to your database instance. [pg admin](https://www.pgadmin.org/)
-
-### Trade-offs
-
-+ Deciding not to support public IP
-+ Supporting _only_ the Cloud SQL Auth proxy (for now)
-+ SSL/TLS only, no support for unencrypted traffic
-+ This bundle supports regional HA. If there's a zonal outage, failover is performed automatically for you. We do not currently support _failbacks_ (after recovery, moving the primary instance back to the original zone).
-
-### Permissions
-
-`cloudsql.instances.connect`
+## Trade-Offs
+* This bundle does not support a public IP.
+* The bundle supports only SSL/TLS. It does not support unencrypted traffic.
+* As noted above, this bundle supports regional high availability but not failbacks. In case of a failover, the primary instance will not move back to the original zone after the original primary recovers.
