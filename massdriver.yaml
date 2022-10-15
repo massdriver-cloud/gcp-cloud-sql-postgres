@@ -3,11 +3,11 @@ name: gcp-cloud-sql-postgres
 description: "Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases."
 source_url: github.com/massdriver-cloud/gcp-cloud-sql-postgres
 access: public
-type: bundle
-
-steps:
-  - path: src
-    provisioner: terraform
+type: infrastructure
+tags:
+  - database
+cloud: 
+  - GCP
 
 params:
   examples:
