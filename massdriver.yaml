@@ -3,18 +3,16 @@ name: gcp-cloud-sql-postgres
 description: "Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases."
 source_url: github.com/massdriver-cloud/gcp-cloud-sql-postgres
 access: public
-type: bundle
-
-steps:
-  - path: src
-    provisioner: terraform
+type: infrastructure
 
 params:
   examples:
     - __name: Production
       engine_version: "14.x"
       instance_configuration:
-        tier: "db-n1-standard-32"
+        tier: "CUSTOM"
+        cores: 10
+        memory: 19968
         disk_size: 1000
       database_configuration:
         retained_backup_count: 7
@@ -23,7 +21,9 @@ params:
     - __name: Staging
       engine_version: "14.x"
       instance_configuration:
-        tier: "db-n1-standard-8"
+        tier: "CUSTOM"
+        cores: 1
+        memory: 3840
         disk_size: 200
       database_configuration:
         retained_backup_count: 7
@@ -40,6 +40,7 @@ params:
   required:
     - engine_version
     - username
+    - instance_configuration
   properties:
     engine_version:
       type: string
@@ -86,25 +87,48 @@ params:
         tier:
           type: string
           title: Instance Type
-          description: The type of compute used for the master instance.
-          enum:
-            - db-f1-micro
-            - db-g1-small
-            - db-n1-standard-1
-            - db-n1-standard-2
-            - db-n1-standard-4
-            - db-n1-standard-8
-            - db-n1-standard-16
-            - db-n1-standard-32
-            - db-n1-standard-64
-            - db-n1-standard-96
-            - db-n1-highmem-2
-            - db-n1-highmem-4
-            - db-n1-highmem-8
-            - db-n1-highmem-16
-            - db-n1-highmem-32
-            - db-n1-highmem-64
-            - db-n1-highmem-96
+          description: The type of compute used for the database instance.
+          oneOf:
+            - title: F1 Micro
+              const: db-f1-micro
+            - title: G1 Small
+              const: db-g1-small
+            - title: Custom
+              const: CUSTOM
+      dependencies:
+        tier:
+          oneOf:
+            - properties:
+                # TODO: validate core + memory combination
+                  #   min / max are valid first, then...
+                  #   memory_core_ratio = memory / cores
+                  #   900MB <= memory_core_ratio <= 6500MB && (cores % 2 == 0 || cores == 1) && memory % 256 == 0
+                tier:
+                  const: CUSTOM
+                cores:
+                  type: integer
+                  title: Cores
+                  description: The number of cores to use for the database instance. A multiple of 2, at most 96.
+                  minimum: 2
+                  maximum: 96
+                  multipleOf: 2
+                memory:
+                  type: integer
+                  title: Memory
+                  description: The amount of memory to use for the database instance. A multiple of 256 MB, at least 3840 MB. Per-core memory is allowed to range from 900 MB to 6.5 GB.
+                  # nearest multiple of 256 to 3750 MB is 3840
+                  minimum: 3840
+                  # 96 * 6500 MB is max cores times max memory per core
+                  maximum: 624000
+                  multipleOf: 256
+              required:
+                - cores
+                - memory
+            - properties:
+                tier:
+                  enum:
+                    - db-f1-micro
+                    - db-g1-small
     database_configuration:
       type: object
       title: Database Configuration
@@ -172,6 +196,9 @@ ui:
       - disk_size
       - disk_type
       - tier
+      - cores
+      - memory
+      - "*"
   database_configuration:
     ui:order:
       - high_availability_enabled

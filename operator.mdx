@@ -7,7 +7,7 @@ Google Cloud SQL for PostgreSQL enables you to run a relational database with th
 ### Highly Scalable Data Store
 PostgreSQL is an open-source object-relational database-management system. With decades of development behind it and as one of the most popular solutions in its class, PostgreSQL excels as a backend database. It is versatile and adaptable.
 ### ACID Compliant
-PostgreSQL supports the rigorous requirements of financial institutions and others needing exceptional reliability. It supports atomicity, consistency, isolation, and durability (ACID) and online transaction processing (OLTP). 
+PostgreSQL supports the rigorous requirements of financial institutions and others needing exceptional reliability. It supports atomicity, consistency, isolation, and durability (ACID) and online transaction processing (OLTP).
 ### Spatial Data
 PostgreSQL is highly extensible. PostGIS, an extension for a geographical information system (GIS), provides hundreds of functions to process geometric data. In the decades since its initial release, PostGIS has become one of the de facto standards in the open-source GIS world.
 ### JSON Support
@@ -18,9 +18,9 @@ PostgreSQL also supports JSON data in either json or jsonb format. For querying 
 ### Development
 The development preset does not have deletion protection, allowing you to deprovision the database as needed. Since this preset is not intended for production, it will keep only one backup, and it comes with only a 20 GB disk and a shared-core CPU. This preset is suitable as a low-cost test and development instance only.
 ### Staging
-The staging preset provides high availability and the same backup and deletion protection as the production preset, with seven backups kept at all times. However, staging has only eight cores and a smaller 200 GB disk.
+The staging preset provides high availability and the same backup and deletion protection as the production preset, with seven backups kept at all times. However, staging has only 1 core and a smaller 200 GB disk.
 ### Production
-The production preset comes with thirty-two cores and a 1 TB disk. High availability, backups, and deletion protection (with seven backups) are enabled by default. For Postgres, we use the latest managed version of the 14.x series. This preset has sufficient resources to support a full production environment.
+The production preset comes with ten cores and a 1 TB disk. High availability, backups, and deletion protection (with seven backups) are enabled by default. For Postgres, we use the latest managed version of the 14.x series. This preset has sufficient resources to support a full production environment.
 
 ## Design
 
@@ -47,7 +47,7 @@ Replica configuration will be supported in a future release. Google recommends t
 ### Auto-generated password
 Upon database creation, we generate a random sixteen-character password.
 ### Private deployment
-This database will be available only in the gcp-global-network to which it is connected. 
+This database will be available only in the gcp-global-network to which it is connected.
 ### Data encrypted in transit
 By default, all data in transit will be encrypted with Secure Sockets Layer and Transport Layer Security (SSL/TLS).
 ### Data encrypted at rest
