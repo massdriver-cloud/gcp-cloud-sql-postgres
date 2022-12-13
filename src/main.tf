@@ -5,7 +5,9 @@ locals {
   gcp_authentication = jsonencode(var.gcp_authentication.data)
   region             = var.subnetwork.specs.gcp.region
   # Cloud SQL expects the Global VPC GRN
-  network_id = var.subnetwork.data.infrastructure.gcp_global_network_grn
+  network_id     = var.subnetwork.data.infrastructure.gcp_global_network_grn
+  is_custom_tier = var.instance_configuration.tier == "CUSTOM"
+  db_tier        = local.is_custom_tier ? "db-custom-${var.instance_configuration.cores}-${var.instance_configuration.memory}" : var.instance_configuration.tier
 
   major_version_to_database_version = {
     "14.x"  = "POSTGRES_14"
@@ -52,7 +54,7 @@ resource "google_sql_database_instance" "main" {
   deletion_protection = var.deletion_protection
 
   settings {
-    tier = var.instance_configuration.tier
+    tier = local.db_tier
     # ALWAYS, NEVER, ON_DEMAND
     activation_policy = "ALWAYS"
     availability_type = "REGIONAL"
