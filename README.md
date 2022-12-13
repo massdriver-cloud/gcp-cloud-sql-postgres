@@ -65,7 +65,11 @@ Form input parameters for configuring a bundle for deployment.
 - **`instance_configuration`** *(object)*: Instance type, disk size, configure properties for your primary instance.
   - **`disk_size`** *(integer)*: The size of the primary database instance in GB. Minimum: `20`. Maximum: `3054`.
   - **`disk_type`** *(string)*: Solid State has better performance for mixtures of reads and writes. Use Hard Disks for continuous read workloads or for cheaper storage. Must be one of: `['Solid State', 'Hard Disk']`. Default: `Solid State`.
-  - **`tier`** *(string)*: The type of compute used for the master instance. Must be one of: `['db-f1-micro', 'db-g1-small', 'db-n1-standard-1', 'db-n1-standard-2', 'db-n1-standard-4', 'db-n1-standard-8', 'db-n1-standard-16', 'db-n1-standard-32', 'db-n1-standard-64', 'db-n1-standard-96', 'db-n1-highmem-2', 'db-n1-highmem-4', 'db-n1-highmem-8', 'db-n1-highmem-16', 'db-n1-highmem-32', 'db-n1-highmem-64', 'db-n1-highmem-96']`.
+  - **`tier`** *(string)*: The type of compute used for the database instance.
+    - **One of**
+      - F1 Micro
+      - G1 Small
+      - Custom
 - **`transaction_log_retention_days`** *(integer)*: The number of days to keep the transaction logs before deleting them. Minimum: `1`. Maximum: `7`. Default: `5`.
 - **`username`** *(string)*: Primary DB username. Default: `root`.
 ## Examples
@@ -80,8 +84,10 @@ Form input parameters for configuring a bundle for deployment.
       "deletion_protection": true,
       "engine_version": "14.x",
       "instance_configuration": {
+          "cores": 10,
           "disk_size": 1000,
-          "tier": "db-n1-standard-32"
+          "memory": 19968,
+          "tier": "CUSTOM"
       }
   }
   ```
@@ -96,8 +102,10 @@ Form input parameters for configuring a bundle for deployment.
       "deletion_protection": true,
       "engine_version": "14.x",
       "instance_configuration": {
+          "cores": 1,
           "disk_size": 200,
-          "tier": "db-n1-standard-8"
+          "memory": 3840,
+          "tier": "CUSTOM"
       }
   }
   ```
@@ -203,11 +211,6 @@ Connections from other bundles that this bundle depends on.
         "us-west2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: GCP Zone.
-
-        Examples:
 - **`subnetwork`** *(object)*: A region-bound network for deploying GCP resources. Cannot contain additional properties.
   - **`data`** *(object)*
     - **`infrastructure`** *(object)*
@@ -276,6 +279,33 @@ Connections from other bundles that this bundle depends on.
         "projects/my-project/locations/us-west2/clusters/my-gke-cluster"
         ```
 
+      - **`vpc_access_connector`** *(string)*: GCP Resource Name (GRN).
+
+        Examples:
+        ```json
+        "projects/my-project/global/networks/my-global-network"
+        ```
+
+        ```json
+        "projects/my-project/regions/us-west2/subnetworks/my-subnetwork"
+        ```
+
+        ```json
+        "projects/my-project/topics/my-pubsub-topic"
+        ```
+
+        ```json
+        "projects/my-project/subscriptions/my-pubsub-subscription"
+        ```
+
+        ```json
+        "projects/my-project/locations/us-west2/instances/my-redis-instance"
+        ```
+
+        ```json
+        "projects/my-project/locations/us-west2/clusters/my-gke-cluster"
+        ```
+
   - **`specs`** *(object)*
     - **`gcp`** *(object)*: .
       - **`project`** *(string)*
@@ -286,11 +316,6 @@ Connections from other bundles that this bundle depends on.
         "us-west2"
         ```
 
-      - **`resource`** *(string)*
-      - **`service`** *(string)*
-      - **`zone`** *(string)*: GCP Zone.
-
-        Examples:
 <!-- CONNECTIONS:END -->
 
 </details>
@@ -364,6 +389,18 @@ Resources created by this bundle that can be connected to other bundles.
                 ```json
                 "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
                 ```
+
+          - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
+            - **`role_arn`** *(string)*: ARN for this resources IAM Role.
+
+              Examples:
+              ```json
+              "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
+              ```
+
+              ```json
+              "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
+              ```
 
           - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
             - **`^[a-z-]+$`** *(object)*
