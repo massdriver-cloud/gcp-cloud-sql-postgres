@@ -1,46 +1,45 @@
 schema: draft-07
 name: gcp-cloud-sql-postgres
-description: "Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases."
-source_url: github.com/massdriver-cloud/gcp-cloud-sql-postgres
-access: public
-type: infrastructure
-
+version: 1.0.0
+description: Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases.
+source_url: https://github.com/massdriver-cloud/gcp-cloud-sql-postgres
+type: application
 params:
   examples:
-    - __name: Production
-      engine_version: "14.x"
-      instance_configuration:
-        tier: "CUSTOM"
-        cores: 10
-        memory: 19968
-        disk_size: 1000
-      database_configuration:
-        retained_backup_count: 7
-        query_insights_enabled: true
-      deletion_protection: true
-    - __name: Staging
-      engine_version: "14.x"
-      instance_configuration:
-        tier: "CUSTOM"
-        cores: 1
-        memory: 3840
-        disk_size: 200
-      database_configuration:
-        retained_backup_count: 7
-        query_insights_enabled: true
-      deletion_protection: true
-    - __name: Development
-      engine_version: "14.x"
-      instance_configuration:
-        tier: "db-f1-micro"
-        disk_size: 20
-      database_configuration:
-        retained_backup_count: 1
-      deletion_protection: false
+  - __name: Production
+    engine_version: 14.x
+    instance_configuration:
+      tier: CUSTOM
+      cores: 10
+      memory: 19968
+      disk_size: 1000
+    database_configuration:
+      retained_backup_count: 7
+      query_insights_enabled: true
+    deletion_protection: true
+  - __name: Staging
+    engine_version: 14.x
+    instance_configuration:
+      tier: CUSTOM
+      cores: 1
+      memory: 3840
+      disk_size: 200
+    database_configuration:
+      retained_backup_count: 7
+      query_insights_enabled: true
+    deletion_protection: true
+  - __name: Development
+    engine_version: 14.x
+    instance_configuration:
+      tier: db-f1-micro
+      disk_size: 20
+    database_configuration:
+      retained_backup_count: 1
+    deletion_protection: false
   required:
-    - engine_version
-    - username
-    - instance_configuration
+  - engine_version
+  - username
+  - instance_configuration
   properties:
     engine_version:
       type: string
@@ -48,12 +47,12 @@ params:
       description: The major version of PostgreSQL to use for your database. GCP manages minor version upgrades.
       default: 14.x
       enum:
-        - 14.x
-        - 13.x
-        - 12.x
-        - 11.x
-        - 10.x
-        - 9.6.x
+      - 14.x
+      - 13.x
+      - 12.x
+      - 11.x
+      - 10.x
+      - 9.6.x
     username:
       title: Username
       description: Primary DB username.
@@ -64,11 +63,11 @@ params:
     instance_configuration:
       type: object
       title: Instance Configuration
-      description: "Instance type, disk size, configure properties for your primary instance."
+      description: Instance type, disk size, configure properties for your primary instance.
       required:
-        - disk_size
-        - disk_type
-        - tier
+      - disk_size
+      - disk_type
+      - tier
       properties:
         disk_size:
           type: integer
@@ -82,59 +81,53 @@ params:
           description: Solid State has better performance for mixtures of reads and writes. Use Hard Disks for continuous read workloads or for cheaper storage.
           default: Solid State
           enum:
-            - Solid State
-            - Hard Disk
+          - Solid State
+          - Hard Disk
         tier:
           type: string
           title: Instance Type
           description: The type of compute used for the database instance.
           oneOf:
-            - title: F1 Micro
-              const: db-f1-micro
-            - title: G1 Small
-              const: db-g1-small
-            - title: Custom
-              const: CUSTOM
+          - title: F1 Micro
+            const: db-f1-micro
+          - title: G1 Small
+            const: db-g1-small
+          - title: Custom
+            const: CUSTOM
       dependencies:
         tier:
           oneOf:
-            - properties:
-                # TODO: validate core + memory combination
-                  #   min / max are valid first, then...
-                  #   memory_core_ratio = memory / cores
-                  #   900MB <= memory_core_ratio <= 6500MB && (cores % 2 == 0 || cores == 1) && memory % 256 == 0
-                tier:
-                  const: CUSTOM
-                cores:
-                  type: integer
-                  title: Cores
-                  description: The number of cores to use for the database instance. A multiple of 2, at most 96.
-                  minimum: 2
-                  maximum: 96
-                  multipleOf: 2
-                memory:
-                  type: integer
-                  title: Memory
-                  description: The amount of memory to use for the database instance. A multiple of 256 MB, at least 3840 MB. Per-core memory is allowed to range from 900 MB to 6.5 GB.
-                  # nearest multiple of 256 to 3750 MB is 3840
-                  minimum: 3840
-                  # 96 * 6500 MB is max cores times max memory per core
-                  maximum: 624000
-                  multipleOf: 256
-              required:
-                - cores
-                - memory
-            - properties:
-                tier:
-                  enum:
-                    - db-f1-micro
-                    - db-g1-small
+          - properties:
+              tier:
+                const: CUSTOM
+              cores:
+                type: integer
+                title: Cores
+                description: The number of cores to use for the database instance. A multiple of 2, at most 96.
+                minimum: 2
+                maximum: 96
+                multipleOf: 2
+              memory:
+                type: integer
+                title: Memory
+                description: The amount of memory to use for the database instance. A multiple of 256 MB, at least 3840 MB. Per-core memory is allowed to range from 900 MB to 6.5 GB.
+                minimum: 3840
+                maximum: 624000
+                multipleOf: 256
+            required:
+            - cores
+            - memory
+          - properties:
+              tier:
+                enum:
+                - db-f1-micro
+                - db-g1-small
     database_configuration:
       type: object
       title: Database Configuration
-      description: "High availability, backups, other database settings can be configured here."
+      description: High availability, backups, other database settings can be configured here.
       required:
-        - retained_backup_count
+      - retained_backup_count
       properties:
         high_availability_enabled:
           type: boolean
@@ -164,43 +157,46 @@ params:
       description: If the DB instance should have deletion protection enabled.
       type: boolean
       default: true
-
 connections:
   required:
-    - gcp_authentication
-    - subnetwork
+  - gcp_authentication
+  - subnetwork
   properties:
     gcp_authentication:
-      $ref: massdriver/gcp-service-account
+      "$ref": massdriver/gcp-service-account
     subnetwork:
-      $ref: massdriver/gcp-subnetwork
-
+      "$ref": massdriver/gcp-subnetwork
 artifacts:
   required:
-    - authentication
+  - authentication
   properties:
     authentication:
-      $ref: massdriver/postgresql-authentication
-
+      "$ref": massdriver/postgresql-authentication
 ui:
   ui:order:
-    - engine_version
-    - username
-    - instance_configuration
-    - database_configuration
-    - transaction_log_retention_days
-    - deletion_protection # Need to keep this so people CAN delete (turn it off, then delete)
-    - "*"
+  - engine_version
+  - username
+  - instance_configuration
+  - database_configuration
+  - transaction_log_retention_days
+  - deletion_protection
+  - "*"
   instance_configuration:
     ui:order:
-      - disk_size
-      - disk_type
-      - tier
-      - cores
-      - memory
-      - "*"
+    - disk_size
+    - disk_type
+    - tier
+    - cores
+    - memory
+    - "*"
   database_configuration:
     ui:order:
-      - high_availability_enabled
-      - retained_backup_count
-      - query_insights_enabled
+    - high_availability_enabled
+    - retained_backup_count
+    - query_insights_enabled
+steps:
+- path: src
+  provisioner: opentofu
+  config:
+    checkov:
+      enable: true
