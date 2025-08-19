@@ -3,7 +3,6 @@ name: gcp-cloud-sql-postgres
 version: 1.0.0
 description: Fully managed PostgreSQL relational database service offering high availability, encryption, backups and zero-downtime capacity increases.
 source_url: https://github.com/massdriver-cloud/gcp-cloud-sql-postgres
-type: application
 params:
   examples:
   - __name: Production
