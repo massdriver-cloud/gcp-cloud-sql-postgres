@@ -18,9 +18,8 @@ locals {
 }
 
 resource "massdriver_artifact" "authentication" {
-  field                = "authentication"
-  provider_resource_id = google_sql_database_instance.main.self_link
-  name                 = "'Root' Postgres user credentials for: ${google_sql_database_instance.main.self_link}"
+  field    = "authentication"
+  name     = "'Root' Postgres user credentials for: ${google_sql_database_instance.main.self_link}"
   artifact = jsonencode(
     {
       data = {
