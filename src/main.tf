@@ -1,8 +1,8 @@
 
 locals {
   # massdriver auth and regional cloud vars
-  project_id         = var.gcp_authentication.data.project_id
-  gcp_authentication = jsonencode(var.gcp_authentication.data)
+  project_id         = var.gcp_authentication.project_id
+  gcp_authentication = jsonencode(var.gcp_authentication)
   region             = var.subnetwork.specs.gcp.region
   # Cloud SQL expects the Global VPC GRN
   network_id     = var.subnetwork.data.infrastructure.gcp_global_network_grn

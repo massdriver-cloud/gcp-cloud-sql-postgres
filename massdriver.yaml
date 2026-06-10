@@ -162,15 +162,15 @@ connections:
   - subnetwork
   properties:
     gcp_authentication:
-      "$ref": massdriver/gcp-service-account
+      "$ref": gcp-service-account
     subnetwork:
-      "$ref": massdriver/gcp-subnetwork
+      "$ref": gcp-subnetwork
 artifacts:
   required:
   - authentication
   properties:
     authentication:
-      "$ref": massdriver/postgresql-authentication
+      "$ref": postgresql-authentication
 ui:
   ui:order:
   - engine_version
