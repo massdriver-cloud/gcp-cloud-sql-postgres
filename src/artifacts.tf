@@ -1,11 +1,11 @@
 locals {
-  data_infrastructure = {
+  infrastructure = {
     name = google_sql_database_instance.main.id
   }
 
-  data_security = {}
+  security = {}
 
-  data_authentication = {
+  authentication = {
     username = google_sql_user.root.name
     password = google_sql_user.root.password
     hostname = google_sql_database_instance.main.private_ip_address
@@ -22,11 +22,9 @@ resource "massdriver_artifact" "authentication" {
   name     = "'Root' Postgres user credentials for: ${google_sql_database_instance.main.self_link}"
   artifact = jsonencode(
     {
-      data = {
-        authentication = local.data_authentication
-        infrastructure = local.data_infrastructure
-        security       = local.data_security
-      }
+      authentication = local.authentication
+      infrastructure = local.infrastructure
+      security       = local.security
       specs = {
         rdbms = local.specs_rdbms
       }

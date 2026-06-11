@@ -5,7 +5,7 @@ locals {
   gcp_authentication = jsonencode(var.gcp_authentication)
   region             = var.subnetwork.specs.gcp.region
   # Cloud SQL expects the Global VPC GRN
-  network_id     = var.subnetwork.data.infrastructure.gcp_global_network_grn
+  network_id     = var.subnetwork.infrastructure.gcp_global_network_grn
   is_custom_tier = var.instance_configuration.tier == "CUSTOM"
   db_tier        = local.is_custom_tier ? "db-custom-${var.instance_configuration.cores}-${var.instance_configuration.memory}" : var.instance_configuration.tier
 
